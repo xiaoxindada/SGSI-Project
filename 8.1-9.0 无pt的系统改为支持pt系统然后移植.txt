@@ -1,0 +1,6 @@
+既然谷歌出了pt计划 那么就有个问题 就是有老些机型上了8.1或9.0但是任然不支持pt 那么有没有办法让他支持pt呢 答案肯定是有的 
+
+接下来就开教学：原理就是把不支持pt的system照着pt的样子魔改回去然后用pt的方法来移植就好 （但是不可能完全相同主要还是以我教学的来做）首先把移植包的etc/firmware删掉 替换etc/selinux文件夹为你底包的 把system/vendor 分离出来备用删掉etc/permissions/qti_permissions.xml 修改build的ro.treble.enabled=false为=true 把移植包boot解开 把里面的default.prop改名为prop.default放入etc里面 添加id.config.vndk_lite.txt最后把system/etc链接到vendor分区就行了 链接方法可以通过写个刷机脚本 内容：symlink("/vendor", "/system/vendor"); 即可
+
+然后用分离出来的vendor做出vendor补丁 
+做出boot补丁 即可

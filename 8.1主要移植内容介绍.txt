@@ -1,0 +1,71 @@
+通过上面的简单介绍 想必你已经对SGSI有了初步的理解 那么现在就进入正题 
+
+首先 你必备的技能需要 1.会写安卓刷机脚本 即做vendor所需要的补丁 （这里你可能会问为啥要做补丁） 因为要把要移植的东西只有做成了补丁形式 才能让任意的机型都能刷上 你不做补丁的话 那么也就失去了通用这一特性
+
+2.会看错误日志 logcat（这个就不用解释了 都懂）
+
+ 因为 厂商把特定的东西都放到了vendor 所以做SGSI的核心 也就是灵魂 移植venor 把oem添加的东西都加上来 到你本机的vendor中 system只需要少量的修改
+  
+  刷入你支持pt的同安卓版本的rom作为底包
+  
+  8.1系统移植：首先vendor补丁中需要添加的东西有 
+  
+  app（app层）
+  bin（服务主体层）
+  etc（配置文件层）
+  lib （驱动层）
+  lib64 （驱动层）
+  overlay（系统覆盖层）
+  media （系统媒体服务层）
+  package （系统包装层）
+  default.prop （系统部分默认功能配置参数文件）
+  build.prop （系统初始化默认值配置文件（注册表））
+  manifest.xml （服务的hal接口层）
+  
+这里还要主意一下你所有的文件里面的权限设置 你只要设置bin文件夹里面的所有东西的权限即可 其他的可以保持默认也就是可以不用写 如果你不清楚vendor的bin权限规范 你可以看看你底包的bin 因为安卓文件的权限都是固定的 都可以参考
+
+  添加app层里面所有东西
+  
+  bin层找到oem添加的所有的oem添加的服务 通常在bin bin/hw（比如MIUI移植的话 搜索关键字xiaomi flyme移植搜索关键字 meizu 总之靠你自行找到所有oem的服务）
+  （小提示：一个服务完整依赖分别在bin etc/init lib lib64 system服务的话部分在framework也有依赖）
+  
+  etc层 添加bin服务的指定启用服务的rc 位置etc/init 
+  添加etc所有的media_profiles开头的xml文件 和 oem添加的定制xml文件（比如 xxx.MIUI.xxx.xml）
+  
+  删掉你底包vendor/etc/permissions的qti_permissions.xml文件
+  
+  添加permissions文件夹里面oem定制的权限文件（比如vendor.xxx.miui.xxx.xml）
+  
+  以及你没见过的或者你不太确定的 oem多余的所有你感觉有用的东西
+  
+  lib/lib64层 添加所有bin的oem服务所要依赖的驱动 通常以对应bin服务的名字命名 以及自带的音频驱动文件夹soundfx当然你也可以不添加 不过添加了可以防止一堆系统开机后音频出现问题
+  
+  添加media overlay package文件夹里的所有东西 刷入的时候记得先删除你底包的vendor的这些文件夹 因为不干净的话可能导致一堆问题而不开机 所以推荐纯净刷入
+  
+  system的处理
+  
+  要移植改动的东西有 build.prop manifest.xml etc/selinux文件夹 替换selinux文件夹为一底包system里面的（如果不提换就可能遇到直接重启到fastboot模式 黑屏亮灯 黑屏 无限重启等这些情况 因为selinux安全验证不通过） 删除掉etc/permissions里的qti_permissions.xml（因为这个老是报错 报错就不开机卡2屏或重启到rec）把分散到vendor的时候build里面的BUILD_PROPERTIES下的 oem参数添加进来 当然你也可以开机以后添加 部分参数可能导致不开机 然后找到etc的prop.default文件 把vendor的default文件里面的这些代码：
+  
+dalvik.vm.image-dex2oat-Xms=64m
+dalvik.vm.image-dex2oat-Xmx=64m
+dalvik.vm.dex2oat-Xms=64m
+dalvik.vm.dex2oat-Xmx=512m
+dalvik.vm.usejit=true
+dalvik.vm.usejitprofiles=true
+dalvik.vm.dexopt.secondary=true
+dalvik.vm.appimageformat=lz4
+ro.dalvik.vm.native.bridge=0
+pm.dexopt.first-boot=quicken
+pm.dexopt.boot=verify
+pm.dexopt.install=speed-profile
+pm.dexopt.bg-dexopt=speed-profile
+pm.dexopt.ab-ota=speed-profile
+pm.dexopt.inactive=verify
+pm.dexopt.shared=speed （控制开机的参数 参数可能不同 请以移植报的vendor的default文件为准）添加进来
+
+添加vendor的manifest.xml里面的oem服务的hal到system的manifest.xml里面来（此hal的添加更具你vendor里面添加的服务来定 每个bin里面的服务都会有hal记录在里面 如果你vendor没添加oem的服务那么你可以忽略这个）
+ 
+ boot的处理 首先把你底包的boot启用宽容模式permissive
+ 然后把移植包boot里面的ramdisk里面的oem用于启用系统的rc （比如MIUI就有一个init.MIUI.rc 氢os有个init.oem.rc) init.rc init.environ.rc 添加到底包boot的ramdisk里面去（要注意oem初始化rc的里面所提到的所有rc 而且还要主意部分有oem的rc的系统 init.rc里面并没有指定oem的rc这时候就要自行添加指定进去否则可能会调用不上导致不开机）关于boot的处理 也有补丁 我会放个模板你只要自行添加ramdisk的rc就好 (补丁原作者 erfanoabdi)
+ 
+ 做好以上所有处理后打包system成img或者你用rec备份形式也可以 然后刷入你的手机 刷入两个补丁以后 运气好data分区就会有数据加载而且能看到2屏 然后抓log来慢慢调试直到开机 如果没有2屏 你可以看log的cpu部分 看看有报什么错 解决以后就ok了 如果data没有数据加载而且也没2屏 那么更换你的pt底包直到data有数据加载你就可以继续调试了

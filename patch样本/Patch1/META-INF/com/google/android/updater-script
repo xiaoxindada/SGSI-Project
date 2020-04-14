@@ -1,0 +1,75 @@
+ui_print("xiaoxindada SGSI Patch1 MIUI11 9.0");
+
+run_program("/sbin/busybox", "mount", "/vendor");
+
+package_extract_dir("vendor", "/vendor");
+
+set_metadata("/vendor/bin/batteryd", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/fidoca", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/mi_thermald", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/minidump64", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/mlipayd@1.1", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/mtd@1.2", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/poweroffm64", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/thermal-engine", "uid", 0, "gid", 2000, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/tidad@1.1", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/vendor.qti.hardware.soter@1.0-provision", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/vsimd", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/android.hardware.contexthub@1.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/android.hardware.dumpstate@1.0-service.xiaomi", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/android.hardware.neuralnetworks@1.1-service-qti", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/hostapd", "uid", 0, "gid", 2000, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:hal_wifi_hostapd_default_exec:s0");
+
+set_metadata("/vendor/bin/hw/qcrild", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.qti.esepowermanager@1.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.qti.hardware.alarm@1.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.qti.hardware.factory@1.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.qti.hardware.qdutils_disp@1.0-service-qti", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.qti.hardware.qteeconnector@1.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.qti.hardware.scve.objecttracker@1.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.qti.hardware.scve.panorama@1.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.qti.hardware.seccam@1.0-service-qti", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.qti.hardware.sensorscalibrate@1.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.qti.hardware.soter@1.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.qti.hardware.tui_comm@1.0-service-qti", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.qti.secure_element@1.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.xiaomi.hardware.citsensorservice@1.1-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.xiaomi.hardware.displayfeature@1.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.xiaomi.hardware.misys@1.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.xiaomi.hardware.misys@2.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/vendor.xiaomi.hardware.touchfeature@1.0-service", "uid", 0, "gid", 0, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:vendor_file:s0");
+
+set_metadata("/vendor/bin/hw/wpa_supplicant", "uid", 0, "gid", 2000, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:hal_wifi_supplicant_default_exec:s0");
+
+ui_print("Installation complete!");

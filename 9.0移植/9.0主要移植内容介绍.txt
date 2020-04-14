@@ -1,0 +1,60 @@
+通过8.1的教程 想必你对sgsi已经有了一定的经验 那么9.0移植就会更轻松了
+
+8.1和9.0大体上移植思路和处理没变 只是9.0相对8.1做了部分调整 现在我就来教学9.0的处理
+
+首先 你必备的技能需要 1.会写安卓刷机脚本 即做vendor所需要的补丁 （这里你可能会问为啥要做补丁） 因为要把要移植的东西只有做成了补丁形式 才能让任意的机型都能刷上 你不做补丁的话 那么也就失去了通用这一特性
+
+2.会看错误日志 logcat（这个就不用解释了 都懂）
+
+ 因为 厂商把特定的东西都放到了vendor 所以做SGSI的核心 也就是灵魂 移植venor 把oem添加的东西都加上来 到你本机的vendor中 system只需要少量的修改
+  
+  刷入你支持pt的同安卓版本的rom作为底包
+  
+  9.0系统移植（a-only）：首先vendor补丁中需要添加的东西有 
+  
+  app（app层）
+  bin（服务主体层）
+  etc（配置文件层）
+  lib （驱动层）
+  lib64 （驱动层）
+  overlay（系统覆盖层）
+  media （系统媒体服务层）
+  build.prop （系统初始化默认值配置文件（注册表））
+  manifest.xml （服务的hal接口层）
+  
+这里还要主意一下你所有的文件里面的权限设置 你只要设置bin文件夹里面的所有东西的权限即可 其他的可以保持默认也就是可以不用写 如果你不清楚vendor的bin权限规范 你可以看看你底包的bin 因为安卓文件的权限都是固定的 都可以参考
+
+  添加app层里面所有东西
+  
+  bin层找到oem添加的所有的oem添加的服务 通常在bin bin/hw（比如MIUI移植的话 搜索关键字xiaomi flyme移植搜索关键字 meizu 总之靠你自行找到所有oem的服务）
+  （小提示：一个服务完整依赖分别在bin etc/init lib lib64 system服务的话部分在framework也有依赖）
+  
+  etc层 添加bin服务的指定启用服务的rc 位置etc/init 
+  添加etc所有的media_profiles开头的xml文件 和 oem添加的定制xml文件（比如 xxx.MIUI.xxx.xml）
+  
+  删掉你底包vendor/etc/permissions的qti_permissions.xml文件
+  
+  添加permissions文件夹里面oem定制的权限文件（比如vendor.xxx.miui.xxx.xml）
+  
+  以及你没见过的或者你不太确定的 oem多余的所有你感觉有用的东西
+  
+  lib/lib64层 添加所有bin的oem服务所要依赖的驱动 通常以对应bin服务的名字命名 以及自带的音频驱动文件夹soundfx当然你也可以不添加 不过添加了可以防止一堆系统开机后音频出现问题
+  
+  添加media overlay 文件夹里的所有东西 刷入的时候记得先删除你底包的vendor的这些文件夹 因为不干净的话可能导致一堆问题而不开机 所以推荐纯净刷入
+  
+  system的处理 
+  
+  ab/sar机型的system结构转换为a-only结构：
+  首先ab/sar机型的syatem有两层而a-only的system只有一层 把外面的那层system文件夹里面的东西全部删掉（除了这里面的还有一层system文件夹留下）把里层system文件夹里移动出来即可 然后删掉空的system文件夹
+  此过程可以使用rec操作
+  
+  要移植改动的东西有 build.prop manifest.xml etc/selinux文件夹 如果直接刷system.img boot也改为了宽容模式 看不到2屏直接重启到fastboot等情况
+ 替换selinux文件夹为一底包system里面的 如果你不想替换也可以和8.1不同 9.0可以直接处理selinunx 处理方法 打开selinux文件夹把除了mapping文件夹里面的文件不要处理外其它的文件里面把有关vendor内容的验证全部删掉然后就能进入2屏了 如果这样做了还不行那就是因为这个包selinux魔改的太多 那就直接换为底包的selinux文件夹即可 
+  把ld.config.vndk_lite.txt文件夹添加到etc里面 （因为部分机型部分底包是通过这个文件来调用vndk的驱动的（比如小米6的原生底包）而这个文件只有在原生里面才有 移植包里面一般是没有的请注意 如果一直包只有ld.config.vndk_lite.txt那么就添加上ld.config.28.txt）删除掉etc/permissions里的qti_permissions.xml（因为这个老是报错 报错就不开机卡2屏或重启到rec）把分散到vendor的时候build里面的BUILD_PROPERTIES下的 oem参数添加进来 当然你也可以开机以后添加 部分参数可能导致不开机 
+
+添加vendor的etc/vintf/manifest.xml里面的oem服务的hal到system的etc/vintf/manifest.xml里面来（此hal的添加更具你vendor里面添加的服务来定 每个bin里面的服务都会有hal记录在里面 如果你vendor没添加oem的服务那么你可以忽略这个）
+ 
+ boot的处理 首先把你底包的boot启用宽容模式permissive
+ 然后把移植包boot里面的ramdisk里面的oem用于启用系统的rc （比如MIUI就有一个init.MIUI.rc 氢os有个init.oem.rc) init.rc init.environ.rc 添加到底包boot的ramdisk里面去（要注意oem初始化rc的里面所提到的所有rc 而且还要主意部分有oem的rc的系统 init.rc里面并没有指定oem的rc这时候就要自行添加指定进去否则可能会调用不上导致不开机）关于boot的处理 也有补丁 我会放个模板你只要自行添加ramdisk的rc就好 (补丁原作者 erfanoabdi) 如果原包是ab/sar机型的system 那么需要的rc文件就在外面的那一层system文件夹里面提取
+ 
+ 做好以上所有处理后打包system成img或者你用rec备份形式也可以 然后刷入你的手机 刷入两个补丁以后 运气好data分区就会有数据加载而且能看到2屏 然后抓log来慢慢调试直到开机 如果没有2屏 你可以看log的cpu部分 看看有报什么错 解决以后就ok了 如果data没有数据加载而且也没2屏 那么更换你的pt底包直到data有数据加载你就可以继续调试了

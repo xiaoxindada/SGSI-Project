@@ -1,0 +1,8 @@
+使用pc端抓log： 1. 首先把你本机的 adb调试秘钥提取出来 替换掉 adb key.zip里的adb_keys 然后在需要调试之前把卡刷包刷入（刷入以后不能清理data）否则需要重新刷入
+2.修改配置文件system/etc/prop.default的参数
+ro.secure=1 改为=0 
+ro.adb.secure=1 改为=0 （调试结束以后记得改回来不然adb调试无法授权）
+ro.debuggable=0 改为=1
+persist.sys.usb.config=none 改为=adb
+
+无adb抓log方法：刷入抓logcat卡刷.zip 然后重启手机调试几分钟 重启至rec 在data/data/下有个logcat.txt
